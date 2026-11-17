@@ -1,6 +1,4 @@
-from flask import Flask, request
-
-app = Flask(__name__)
+import streamlit as st
 
 def simple_chatbot(user_query):
     if user_query == "What is the total revenue?":
@@ -18,8 +16,32 @@ def simple_chatbot(user_query):
        return "Sorry, I can only provide information on predefined queries."
    
 
-@app.route("/query")
-def user_query():
-    question = request.args.get("question", "Flask")
-    res = simple_chatbot(question)
-    return res
+st.title("Financial Analysis Chatbot")
+
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Display chat messages from history on appm rerun
+    
+for message in st.session_state.messages:
+    with st.chat_message(message['key']): 
+        st.markdown(message['value'])
+
+
+if prompt := st.chat_input("Please ask your financial query."):
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    st.session_state.messages.append({'key': "user", 'value': prompt})
+
+
+# Display assistant response in chat message container
+if prompt:  
+    with st.chat_message("assistant"):
+        response = simple_chatbot(prompt)
+        st.markdown(response)
+    # Add assistant response to chat history
+    st.session_state.messages.append({"key": "assistant", "value": response})
+    
+
